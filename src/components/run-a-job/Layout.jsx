@@ -43,7 +43,8 @@ export function Layout({ children }) {
 	// Hook designed specifically to manage the store within the "FLOW" tab, we get the function to change the flow if values were saved in the local storage.
 	const { onFlowChange } = useSelectAFlow()
 
-	const fetchFlowData = async flowId => {
+	const initialPageWithQueryParams = async flowId => {
+		// first we fetch the latest tag of the flow
 		const tag = await fetchLatestFlowLatestTag(flowId)
 		if (tag) {
 			const portfolioId = tag.attrs.portfolioId?.value
@@ -88,9 +89,8 @@ export function Layout({ children }) {
 	useEffect(() => {
 		const loadData = async () => {
 			if (hasFlowId) {
-				await fetchFlowData(flowId)
+				await initialPageWithQueryParams(flowId)
 			} else {
-				console.log('else')
 				await delay(500)
 				loadDataFromLocalStorage('portfolio', setSelectedPortfolio)
 				loadDataFromLocalStorage('stream', setSelectedStream)
