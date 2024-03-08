@@ -17,6 +17,10 @@ export function SelectPolicy() {
 						{
 							value: '02',
 							label: 'Policy Test (1.1) -  Tottham Policy'
+						},
+						{
+							value: '03',
+							label: 'Policy Test (1.2) -  Tottham Policy'
 						}
 					]}
 					value={selectedPolicy.value}

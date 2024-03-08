@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import PropTypes from 'prop-types'
-import { Badge, Form } from 'react-bootstrap'
+import { Badge, Button, Form } from 'react-bootstrap'
 import { CiCircleCheck, CiCircleRemove } from 'react-icons/ci'
 
 const styles = {
@@ -38,8 +38,14 @@ export function EnhancedInputSelect({
 	value
 }) {
 	const [selectedValue, setSelectedValue] = useState(defaultValue)
+
 	const selectedOption = options.find(option => option.value === selectedValue)
-	const { creditGradeType = null, datasetDescription = null, policies = '' } = selectedOption ?? {}
+	const {
+		creditGradeType = null,
+		datasetDescription = 'No description found in attributes.',
+		policies = ''
+	} = selectedOption ?? {}
+	const isSignedOff = policyId ? policies.includes(policyId + ':PASS') : false
 
 	const handleSelectChange = event => {
 		const selectedOption = event.target.value
@@ -49,15 +55,6 @@ export function EnhancedInputSelect({
 			onChange(selectedOption)
 		}
 	}
-
-	// from all the options, get the one that matches the value
-
-	const isSignedOff = policies.includes(policyId + ':PASS')
-	console.log({
-		policyId,
-		policies,
-		isSignedOff
-	})
 
 	return (
 		<Form.Group controlId='formGridState'>
@@ -69,13 +66,18 @@ export function EnhancedInputSelect({
 				</Badge>
 			)}
 
-			{datasetDescription && (
-				<Form.Text style={{ minHeight: '2.3rem' }} className='text-muted mb-3'>
-					{datasetDescription}
-				</Form.Text>
-			)}
-			<div className='d-flex justify-content-center  align-items-center'>
-				<Form.Control disabled={disable} as='select' value={value || selectedValue} onChange={handleSelectChange}>
+			<Form.Text style={{ minHeight: '2.3rem' }} className='text-muted mb-3'>
+				{datasetDescription}
+			</Form.Text>
+
+			<div className='d-flex justify-content-center  align-items-center' style={{ gap: '10px' }}>
+				<Form.Control
+					className='mr-3'
+					disabled={disable}
+					as='select'
+					value={value || selectedValue}
+					onChange={handleSelectChange}
+				>
 					<option value='' disabled>
 						{options.length ? 'Choose...' : 'No Data Available'}
 					</option>
@@ -86,11 +88,10 @@ export function EnhancedInputSelect({
 					))}
 				</Form.Control>
 
-				{isSignedOff ? (
-					<CiCircleCheck className='ml-2' size={23} color='green' />
-				) : (
-					<CiCircleRemove className='ml-2' size={23} color='red' />
-				)}
+				{isSignedOff ? <CiCircleCheck size={23} color='green' /> : <CiCircleRemove size={23} color='red' />}
+				<Button variant='info' size='sm'>
+					View
+				</Button>
 			</div>
 			<Form.Text className='text-muted'>{text}</Form.Text>
 		</Form.Group>
