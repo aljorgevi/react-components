@@ -511,6 +511,10 @@ export const SEARCH_INPUTS_NODE_RESPONSE = [
 				},
 				attrs: {
 					viewInLists: viewInListAttr,
+					trac_policies: {
+						type: 'string',
+						value: '01:PASS|02:PASS'
+					},
 					datasetDescription: {
 						type: 'string',
 						value: '[live][one]'
@@ -534,6 +538,10 @@ export const SEARCH_INPUTS_NODE_RESPONSE = [
 					reportingId: {
 						type: 'string',
 						value: 'Impairment'
+					},
+					creditGradeType: {
+						type: 'string',
+						value: 'CRD'
 					}
 				}
 			},

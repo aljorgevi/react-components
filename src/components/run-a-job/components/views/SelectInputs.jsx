@@ -1,8 +1,10 @@
 import { Col, Row, Tab, Tabs } from 'react-bootstrap'
 import { useSelectInputs } from '../../hooks/useSelectInputs'
-import { SelectGeneric } from '../../../SelectGeneric'
 import { generateInputsSelectOptions } from '../../../../utils/helpers'
 import { Fragment } from 'react'
+import { EnhancedInputSelect } from '../EnhancedInputSelect'
+
+const policyId = '01'
 
 export function SelectInputs() {
 	const { inputNodesInFlow, selectedInputsInJobDefinition, onInputChange, inputCategories } = useSelectInputs()
@@ -26,8 +28,9 @@ export function SelectInputs() {
 											{inputs
 												.filter(item => item.datasetKey === input)
 												.map((inputItem, j) => (
-													<Col key={j} xs={12} md={4} className='border border-light p-5'>
-														<SelectGeneric
+													<Col key={j} xs={12} md={6} className='border border-light p-5'>
+														<EnhancedInputSelect
+															policyId={policyId}
 															defaultValue={inputItem.defaultValue ?? ''}
 															options={inputItem.options}
 															onChange={inputId => onInputChange({ datasetKey: inputItem.datasetKey, inputId })}
@@ -53,14 +56,15 @@ export function SelectInputs() {
 								eventKey={`${category.category}-subtabs`}
 								title={category.category}
 							>
-								<Row>
+								<Row className='align-items-center '>
 									{category.inputs.map((input, i) => (
 										<Fragment key={i}>
 											{inputs
 												.filter(item => item.datasetKey === input)
 												.map((inputItem, j) => (
-													<Col key={j} xs={12} md={4} className='border border-light p-5'>
-														<SelectGeneric
+													<Col key={j} xs={12} md={6} className='border border-light p-5'>
+														<EnhancedInputSelect
+															policyId={policyId}
 															defaultValue={inputItem.defaultValue ?? ''}
 															options={inputItem.options}
 															onChange={inputId => onInputChange({ datasetKey: inputItem.datasetKey, inputId })}

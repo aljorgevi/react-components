@@ -322,7 +322,15 @@ export function setDefaultInputsForJob(inputsNodeSearchPromiseResponse, flowDefi
 
 function createInputOptionsForSelectAdvances(input) {
 	const { objectId, asOfTime } = input.definition
-	const { datasetName, datasetKeyDisplayName, datasetKey, trac_exp_env } = input.attrs
+	const {
+		datasetName,
+		datasetKeyDisplayName,
+		datasetKey,
+		trac_exp_env,
+		datasetDescription,
+		creditGradeType,
+		trac_policies
+	} = input.attrs
 	const name = datasetName?.value || datasetKeyDisplayName?.value || datasetKey?.value || 'Name not set'
 	const label = createLabel2({ name, objectId, asOfTime })
 
@@ -332,7 +340,11 @@ function createInputOptionsForSelectAdvances(input) {
 		disabled: false,
 		key: input.definition.objectId,
 		title: label,
-		isExpEnv: trac_exp_env?.value
+		isExpEnv: trac_exp_env?.value,
+		datasetKeyDisplayName: datasetKeyDisplayName?.value,
+		datasetDescription: datasetDescription?.value,
+		creditGradeType: creditGradeType?.value,
+		policies: trac_policies?.value
 	}
 }
 
@@ -340,8 +352,6 @@ function assignDefultOptionForInput(tags) {
 	const defaultItemChoice = { key: null, value: null }
 
 	const defaultIndex = tags.findIndex(tag => tag.attrs.defaultForecastSelection?.value)
-	console.log({ defaultIndex })
-	console.log({ tags })
 	defaultItemChoice.key = defaultIndex === -1 ? tags[0].definition.objectId : tags[defaultIndex].definition.objectId
 	defaultItemChoice.value = defaultIndex === -1 ? tags[0] : tags[defaultIndex]
 
@@ -358,7 +368,6 @@ function addDoNotUseInputs(inputChoices, flowDefinitionInputs) {
 			datasets: []
 		}
 
-		console.log(flowDefinitionInputs)
 		if (!flowDefinitionInputs[inputChoice]?.required) {
 			const doNotUse = {
 				doNotUse: true,
@@ -472,6 +481,7 @@ export function generateInputsSelectOptions(inputNodesInFlow, selectedInputsInJo
 				.join(' ')
 				.replace(/\b\w/g, l => l.toUpperCase()),
 			options: value.datasets.map(dataset => ({
+				...dataset,
 				value: dataset.value,
 				label: dataset.label
 			})),

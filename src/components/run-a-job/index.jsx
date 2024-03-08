@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Row, Col } from 'react-bootstrap'
+import { Row, Col, Badge } from 'react-bootstrap'
 import { Layout } from './Layout'
 import { SelectInputs, SelectModels, SelectFlow, Submit, SelectPolicy, SelectParameters } from './components/views'
 import { Sidebar } from './components/Sidebar'

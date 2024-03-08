@@ -131,9 +131,8 @@ export const useSelectAFlow = () => {
 	 * @param {Object} options.attr
 	 * @param {Object} options.nodes
 	 * @param {Object} options.inputs
-	 * @param {Object} options.tag
 	 */
-	async function extractInputFlowInformation({ nodes, inputs, attrs, tag }) {
+	async function extractInputFlowInformation({ nodes, inputs, attrs }) {
 		// Extract input nodes of type 'input'.
 		const inputNodes = filterInputNodes(nodes)
 
@@ -159,13 +158,13 @@ export const useSelectAFlow = () => {
 	}
 
 	// nodes all the nodes, we filter them inside the function
-	async function loadModelsInfoSecondStep({ nodes, tag, selectedPortfolio }) {
+	async function loadModelsInfoSecondStep({ nodes, isModelVersioning, selectedPortfolio }) {
 		// Extract model nodes of type 'model'.
 		const modelNodes = filterModelNodes(nodes)
 		const normalizedPortfolio = selectedPortfolio.toLowerCase()
 
 		let modelsToUse = []
-		if (isModelVersioning(tag)) {
+		if (isModelVersioning) {
 			// TODO: check this in the code to see what the filtering changes depending of the portfolio.
 			const isNotAllOrDevPortfolio = normalizedPortfolio !== 'all' && normalizedPortfolio !== 'dv'
 			const searchPromises = getModelVersioningPromises(modelNodes)
@@ -213,7 +212,7 @@ export const useSelectAFlow = () => {
 			throw new Error('No models found, please check the portfolio selected, or the model versioning.')
 		}
 
-		const result = isModelVersioning(tag)
+		const result = isModelVersioning
 			? getNideksIotuibsAndTagsForModelVersioning(modelsToUse, modelNodes)
 			: getModelsOptionsAndTags(modelsToUse, modelNodes)
 
@@ -257,6 +256,46 @@ export const useSelectAFlow = () => {
 		setSelectedPreviousJob({ ...selectedPreviousJob, value: jobId })
 	}
 
+	async function processFlowSetup({ nodes, inputs, attrs, objectId }) {
+		// first step ✅
+		const { inputCategories, optionalInputs, supportInputs, inputsCounts, nonEmptyDependentParameterData } =
+			await extractInputFlowInformation({ nodes, inputs, attrs })
+
+		// second step ✅
+		const isModelVersioning = attrs.useModelVersioning?.value
+		const { modelNodesInFlow, modelsJobForRequestBody } = await loadModelsInfoSecondStep({
+			nodes,
+			isModelVersioning,
+			selectedPortfolio: selectedPortfolio.value
+		})
+
+		// third step ✅
+		const {
+			// flowSetupInputSelected, // I don't think we need this
+			// flowSetupRequiredInputsWithoutOptions, // TODO: do we need this?
+			inputsJobForRequestBody,
+			inputNodesInFlow
+		} = await loadInputsSecondStep({ nodes, flowDefinitionInputs: inputs })
+
+		// save values in store now 🔒
+		// job request body
+		setJobDefinitionForRequestBody({
+			...jobDefinitionForRequestBody,
+			targetId: objectId,
+			models: modelsJobForRequestBody,
+			inputs: inputsJobForRequestBody
+		})
+		// storing input values
+		setInputCategories(inputCategories)
+		setOptionalInputs(optionalInputs)
+		setSupportInputs(supportInputs)
+		setInputsCounts(inputsCounts)
+		setNonEmptyDependentParameterData(nonEmptyDependentParameterData)
+		setInputNodesInFlow(inputNodesInFlow)
+		// storing model values
+		setModelNodesInFlow(modelNodesInFlow)
+	}
+
 	// once we got our flowId we need to fetch the tag and the flow details.
 	// TODO:
 	// 1. Add a loading state to disable some components
@@ -295,42 +334,8 @@ export const useSelectAFlow = () => {
 
 			setSelectedFlow({ ...selectedFlow, value: flowId, label })
 
-			// first step ✅
-			const { inputCategories, optionalInputs, supportInputs, inputsCounts, nonEmptyDependentParameterData } =
-				await extractInputFlowInformation({ nodes, inputs, attrs, tag })
-
-			// second step ✅
-			const { modelNodesInFlow, modelsJobForRequestBody } = await loadModelsInfoSecondStep({
-				nodes,
-				tag,
-				selectedPortfolio: selectedPortfolio.value
-			})
-
-			// third step ✅
-			const {
-				// flowSetupInputSelected, // I don't think we need this
-				// flowSetupRequiredInputsWithoutOptions, // TODO: do we need this?
-				inputsJobForRequestBody,
-				inputNodesInFlow
-			} = await loadInputsSecondStep({ nodes, flowDefinitionInputs: inputs })
-
-			// save values in store now 🔒
-			// job request body
-			setJobDefinitionForRequestBody({
-				...jobDefinitionForRequestBody,
-				targetId: tag.definition.objectId,
-				models: modelsJobForRequestBody,
-				inputs: inputsJobForRequestBody
-			})
-			// storing input values
-			setInputCategories(inputCategories)
-			setOptionalInputs(optionalInputs)
-			setSupportInputs(supportInputs)
-			setInputsCounts(inputsCounts)
-			setNonEmptyDependentParameterData(nonEmptyDependentParameterData)
-			setInputNodesInFlow(inputNodesInFlow)
-			// storing model values
-			setModelNodesInFlow(modelNodesInFlow)
+			// process the flow setup
+			await processFlowSetup({ nodes, inputs, attrs, objectId })
 
 			if (sendToast) {
 				toast.update(loadingToast, {
@@ -394,6 +399,7 @@ export const useSelectAFlow = () => {
 		onStreamCheckedChange,
 		onFlowCheckedChange,
 		setSelectedPreviousJob,
-		onPreviousJobChange
+		onPreviousJobChange,
+		processFlowSetup
 	}
 }

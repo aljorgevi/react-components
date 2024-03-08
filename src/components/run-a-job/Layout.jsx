@@ -21,6 +21,9 @@ const loadDataFromLocalStorage = (key, setValue) => {
 	}
 }
 
+const nonPortfolioError =
+	'The selected flow does not have a portfolioId associated with it. Please ensure the flow has a portfolio set.'
+
 Layout.propTypes = {
 	children: PropTypes.node
 }
@@ -41,46 +44,35 @@ export function Layout({ children }) {
 	// We acces the store from this hook.
 	const { setSelectedPortfolio, setSelectedStream, setSelectedPolicy, setSelectedFlow, setFlowOptions } = useRunAJob()
 	// Hook designed specifically to manage the store within the "FLOW" tab, we get the function to change the flow if values were saved in the local storage.
-	const { onFlowChange } = useSelectAFlow()
+	const { onFlowChange, processFlowSetup } = useSelectAFlow()
 
 	const initialPageWithQueryParams = async flowId => {
 		// first we fetch the latest tag of the flow
 		const tag = await fetchLatestFlowLatestTag(flowId)
 		if (tag) {
-			const portfolioId = tag.attrs.portfolioId?.value
-			if (!portfolioId) {
-				toast.error(
-					'The selected flow does not have a portfolioId associated with it. Please ensure the flow has a portfolioId set.'
-				)
-				return
+			const { attrs, definition } = tag
+			const { inputs, nodes, asOfTime, objectId } = definition
+			const { flowName, portfolioId } = attrs
+			const label = createLabel2({ asOfTime, name: flowName?.value, objectId })
+
+			if (!portfolioId) return toast.error(nonPortfolioError)
+
+			const flowOptions = await fetchFlowOptions(portfolioId, 'ALL')
+			const isFlowInOptions = flowOptions.some(flow => flow.value === flowId)
+
+			if (isFlowInOptions) {
+				setFlowOptions(flowOptions)
+				setSelectedFlow({ value: flowId, checked: false, label })
+				setSelectedPortfolio({ value: portfolioId, checked: false })
+				setSelectedStream({ value: 'ALL', checked: false })
+				loadDataFromLocalStorage('policy', setSelectedPolicy)
+
+				await processFlowSetup({ nodes, inputs, attrs, objectId })
+
+				setLoading(false)
+			} else {
+				toast.error('The selected flow is not among the available options for the chosen portfolio and stream.')
 			}
-
-			onFlowChange(flowId, false).then(() => {
-				fetchFlowOptions(portfolioId, 'ALL').then(flowOptions => {
-					const isFlowInOptions = flowOptions.some(flow => flow.value === flowId)
-
-					if (isFlowInOptions) {
-						setFlowOptions(flowOptions)
-						setSelectedFlow({
-							value: flowId,
-							checked: false,
-							label: createLabel2({
-								asOfTime: tag.definition.asOfTime,
-								name: tag.attrs.flowCode?.value,
-								objectId: tag.definition.objectId
-							})
-						})
-
-						setSelectedPortfolio({ value: portfolioId, checked: false })
-						setSelectedStream({ value: 'ALL', checked: false })
-						loadDataFromLocalStorage('policy', setSelectedPolicy)
-
-						setLoading(false)
-					} else {
-						toast.error('The selected flow is not among the available options for the chosen portfolio and stream.')
-					}
-				})
-			})
 		} else {
 			toast.error('There was an error fetching the flow tag, ensure the id is correct and try again.')
 		}
@@ -128,6 +120,7 @@ export function Layout({ children }) {
 		}
 
 		loadData()
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
 	return (
@@ -143,7 +136,6 @@ export function Layout({ children }) {
 							<h5 className='mt-5' style={{ fontWeight: 'bold', textAlign: 'center' }}>
 								Loading, please wait...
 							</h5>
-							{/* <BouncingSpinner /> */}
 						</div>
 					</div>
 				) : (
@@ -153,96 +145,3 @@ export function Layout({ children }) {
 		</section>
 	)
 }
-
-// We check values in localStorage, if they exist, we set them in the state.
-// Then the rest of the components will use the state being set here.
-// useEffect(() => {
-// 	// We check if the flowId is in the URL, if it is, we set it in the state.
-// 	if (hasFlowId) {
-// 		fetchLatestFlowLatestTag(flowId).then(tag => {
-// 			if (tag) {
-// 				const portfolioId = tag.attrs.portfolioId?.value
-// 				if (!portfolioId) {
-// 					toast.error(
-// 						'The selected flow does not have a portfolioId associated with it. Please ensure the flow has a portfolioId set.'
-// 					)
-// 					return
-// 				}
-
-// 				setSelectedPortfolio({ value: portfolioId, checked: false })
-// 				setSelectedStream({ value: 'ALL', checked: false })
-// 				loadDataFromLocalStorage('policy', setSelectedPolicy)
-
-// 				// fetch flow options and set the selected flow if it's in the options
-// 				fetchFlowOptions(portfolioId, 'ALL').then(flowOptions => {
-// 					const flowIds = flowOptions.map(flow => flow.value)
-// 					const isFlowInOptions = flowIds.includes(flowId)
-// 					console.log({ isFlowInOptions, flowOptions, flowId, flowIds })
-
-// 					if (isFlowInOptions) {
-// 						onFlowChange(flowId, false).then(() => {
-// 							setFlowOptions(flowOptions)
-// 							setSelectedFlow({
-// 								value: flowId,
-// 								checked: false,
-// 								label: createLabel2({
-// 									asOfTime: tag.definition.asOfTime,
-// 									name: tag.attrs.flowCode?.value,
-// 									objectId: tag.definition.objectId
-// 								})
-// 							})
-
-// 							setLoading(false)
-// 						})
-// 					} else {
-// 						toast.error(
-// 							"The selected flow you've saved is not among the available options for the chosen portfolio and stream. Please ensure your saved flow is compatible with the selected portfolio and stream settings."
-// 						)
-// 					}
-// 				})
-// 			}
-// 		})
-// 	} else {
-// 		delay(500).then(() => {
-// 			loadDataFromLocalStorage('portfolio', setSelectedPortfolio)
-// 			loadDataFromLocalStorage('stream', setSelectedStream)
-// 			loadDataFromLocalStorage('policy', setSelectedPolicy)
-
-// 			// Check if portfolio and stream have been recovered with checked value as true
-// 			if (localStorage.getItem('portfolio') && localStorage.getItem('stream')) {
-// 				const portfolio = JSON.parse(localStorage.getItem('portfolio'))
-// 				const stream = JSON.parse(localStorage.getItem('stream'))
-
-// 				if (portfolio?.checked && stream?.checked) {
-// 					loadDataFromLocalStorage('flow', value => {
-// 						// we ended up here because it hasn't been checked or saved in the local storage
-// 						if (!value || !value.checked) return
-
-// 						const flowId = value.value
-
-// 						// fetch flow options and set the selected flow if it's in the options
-// 						fetchFlowOptions(portfolio.value, stream.value).then(flowOptions => {
-// 							const flowIds = flowOptions.map(flow => flow.value)
-// 							const isFlowInOptions = flowIds.includes(flowId)
-
-// 							if (isFlowInOptions) {
-// 								onFlowChange(flowId, false).then(() => {
-// 									setFlowOptions(flowOptions)
-// 									setSelectedFlow(value)
-// 								})
-// 							} else {
-// 								toast.error(
-// 									"The selected flow you've saved is not among the available options for the chosen portfolio and stream. Please ensure your saved flow is compatible with the selected portfolio and stream settings."
-// 								)
-// 							}
-// 						})
-// 					})
-// 				}
-// 			}
-
-// 			delay(1000).then(() => {
-// 				setLoading(false)
-// 			})
-// 		})
-// 	}
-// }, [])
