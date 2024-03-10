@@ -11,18 +11,9 @@ export function SelectInputs() {
 
 	const inputs = generateInputsSelectOptions(inputNodesInFlow, selectedInputsInJobDefinition)
 
-	console.log({ selectedPolicy })
-
 	return (
 		<>
-			<TextBlock
-				className='pl-1 pt-2'
-				style={{
-					// fontSize: '1.1rem',
-					// italic
-					fontStyle: 'italic'
-				}}
-			>
+			<TextBlock className='pl-1 pt-2' style={{ fontStyle: 'italic' }}>
 				If a particular input is not explicitly categorized, it will be grouped under the General section by default.
 			</TextBlock>
 			<Tabs defaultActiveKey='requiredCategories' id='categories-tabs'>

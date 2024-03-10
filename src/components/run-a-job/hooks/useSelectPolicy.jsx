@@ -1,6 +1,8 @@
 import { useRunAJobStore } from '../store'
+import { useSetQueryParams } from './useSetQueryParams'
 
 export const useSelectPolicy = () => {
+	const { setQueryParams } = useSetQueryParams()
 	const [selectedPolicy, setSelectedPolicy] = useRunAJobStore(state => [state.selectedPolicy, state.setSelectedPolicy])
 
 	const updateLocalStorage = (checked, value) => {
@@ -11,6 +13,7 @@ export const useSelectPolicy = () => {
 		setSelectedPolicy({ checked: selectedPolicy.checked, value: id })
 
 		updateLocalStorage(selectedPolicy.checked, id)
+		setQueryParams({ policyId: id })
 	}
 
 	const onCheckedChange = event => {

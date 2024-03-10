@@ -37,7 +37,7 @@ Layout.propTypes = {
  * @returns
  */
 export function Layout({ children }) {
-	const { flowId, hasFlowId } = useQueryChecker()
+	const { flowId, policyId, previousJob } = useQueryChecker()
 
 	const selectedFlow = useRunAJobStore(store => store.selectedFlow)
 	const [loading, setLoading] = useState(true)
@@ -57,13 +57,13 @@ export function Layout({ children }) {
 
 			if (!portfolioId) return toast.error(nonPortfolioError)
 
-			const flowOptions = await fetchFlowOptions(portfolioId, 'ALL')
+			const flowOptions = await fetchFlowOptions(portfolioId.value, 'ALL')
 			const isFlowInOptions = flowOptions.some(flow => flow.value === flowId)
 
 			if (isFlowInOptions) {
 				setFlowOptions(flowOptions)
 				setSelectedFlow({ value: flowId, checked: false, label })
-				setSelectedPortfolio({ value: portfolioId, checked: false })
+				setSelectedPortfolio({ value: portfolioId.value, checked: false })
 				setSelectedStream({ value: 'ALL', checked: false })
 				loadDataFromLocalStorage('policy', setSelectedPolicy)
 
@@ -80,7 +80,7 @@ export function Layout({ children }) {
 
 	useEffect(() => {
 		const loadData = async () => {
-			if (hasFlowId) {
+			if (flowId) {
 				await initialPageWithQueryParams(flowId)
 			} else {
 				await delay(500)
@@ -89,26 +89,25 @@ export function Layout({ children }) {
 				loadDataFromLocalStorage('policy', setSelectedPolicy)
 
 				if (localStorage.getItem('portfolio') && localStorage.getItem('stream')) {
+					console.log('Loading from local storage...')
 					const portfolio = JSON.parse(localStorage.getItem('portfolio'))
 					const stream = JSON.parse(localStorage.getItem('stream'))
 
 					if (portfolio?.checked && stream?.checked) {
-						loadDataFromLocalStorage('flow', value => {
-							if (value && value.checked) {
-								fetchFlowOptions(portfolio.value, stream.value).then(flowOptions => {
-									const isFlowInOptions = flowOptions.some(flow => flow.value === value.value)
+						const flowOptions = await fetchFlowOptions(portfolio.value, stream.value)
+						setFlowOptions(flowOptions)
 
-									if (isFlowInOptions) {
-										onFlowChange(value.value, false).then(() => {
-											setFlowOptions(flowOptions)
-											setSelectedFlow(value)
-										})
-									} else {
-										toast.error(
-											'The selected flow is not among the available options for the chosen portfolio and stream.'
-										)
-									}
-								})
+						loadDataFromLocalStorage('flow', value => {
+							if (value?.checked) {
+								const isFlowInOptions = flowOptions.some(flow => flow.value === value.value)
+
+								if (isFlowInOptions) {
+									onFlowChange(value.value, false).then(() => {
+										setSelectedFlow(value)
+									})
+								}
+							} else {
+								toast.error('The selected flow is not among the available options for the chosen portfolio and stream.')
 							}
 						})
 					}

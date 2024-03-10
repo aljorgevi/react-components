@@ -6,14 +6,13 @@ export function useQueryChecker() {
 
 	const flowId = queryParams.get('flowId')
 	const previousJob = queryParams.get('previousJob')
+	const policyId = queryParams.get('policyId')
 
-	const hasFlowId = queryParams.has('flowId')
-	const hasPreviousJob = queryParams.has('previousJob')
+	console.log(policyId)
 
 	return {
 		flowId,
 		previousJob,
-		hasFlowId,
-		hasPreviousJob
+		policyId
 	}
 }

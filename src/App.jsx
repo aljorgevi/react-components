@@ -1,17 +1,21 @@
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
 import { Container } from 'react-bootstrap'
-import { BrowserRouter } from 'react-router-dom'
 import { ToastContainer } from 'react-toastify'
 import { RunAJob } from './components/run-a-job'
 
 function App() {
 	return (
 		<div>
-			<BrowserRouter>
+			<Router>
 				<Container>
-					<RunAJob />
+					<Switch>
+						<Route path='/run-a-job'>
+							<RunAJob />
+						</Route>
+					</Switch>
 					<ToastContainer position='bottom-right' />
 				</Container>
-			</BrowserRouter>
+			</Router>
 		</div>
 	)
 }

@@ -26,6 +26,7 @@ SelectGeneric.propTypes = {
 }
 
 export function SelectGeneric({ disable = false, options, defaultValue = '', label, text, onChange, value }) {
+	console.log({ value })
 	const [selectedValue, setSelectedValue] = useState(defaultValue)
 
 	const handleSelectChange = event => {

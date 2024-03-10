@@ -6,7 +6,6 @@ import { isEmpty } from '../../../../utils/helpers'
 import { CheckboxGroup } from '../CheckboxGroup'
 
 export const SelectFlow = () => {
-	// store
 	const [portfolioOptions, streamOptions] = useRunAJobStore(store => [store.portfolioOptions, store.streamOptions])
 
 	const {
@@ -20,7 +19,7 @@ export const SelectFlow = () => {
 		previousJobOptions,
 		onFlowChange,
 		loadFlows,
-		onPolicyCheckedChange,
+		onPortfolioCheckedChange,
 		onPortfolioChange,
 		onStreamChange,
 		onStreamCheckedChange,
@@ -37,6 +36,8 @@ export const SelectFlow = () => {
 			: 'Start by selecting a portfolio and stream to load flows'
 	}`
 
+	console.log({ selectedPortfolio })
+
 	return (
 		<section>
 			<Row>
@@ -47,7 +48,7 @@ export const SelectFlow = () => {
 						options={portfolioOptions}
 						label='Portfolio'
 					/>
-					<CheckboxGroup onChange={onPolicyCheckedChange} checked={selectedPortfolio.checked} />
+					<CheckboxGroup onChange={onPortfolioCheckedChange} checked={selectedPortfolio.checked} />
 				</Col>
 			</Row>
 			<Row className='mt-3'>

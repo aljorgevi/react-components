@@ -23,7 +23,7 @@ import {
 import { MODELS_TO_USE } from '../../../../data/local-data'
 import { useGetControlTable } from './useGetControlTable'
 import { fetchFlows } from '../../../../api/meta-service'
-import { isModelVersioning } from '../../../../factories/model-factory'
+import { useSetQueryParams } from './useSetQueryParams'
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
 
@@ -31,6 +31,7 @@ const flowToRun = {}
 
 // ⭐️ onFlowChange
 export const useSelectAFlow = () => {
+	const { setQueryParams } = useSetQueryParams()
 	const dataFlowInputCategories = useGetControlTable('flow_input_categories')
 	const [isLoadingFlows, setIsLoadingFlows] = useState(false)
 	const [isLoadingFlowMetadata, setIsLoadingFlowMetadata] = useState(false)
@@ -92,7 +93,7 @@ export const useSelectAFlow = () => {
 		localStorage.setItem(key, JSON.stringify({ checked, value, label }))
 	}
 
-	function onPolicyCheckedChange(event) {
+	function onPortfolioCheckedChange(event) {
 		const { checked } = event.target
 
 		setSelectedPortfolio({ checked, value: selectedPortfolio.value })
@@ -101,7 +102,6 @@ export const useSelectAFlow = () => {
 
 	function onPortfolioChange(value) {
 		setSelectedPortfolio({ checked: selectedPortfolio.checked, value })
-
 		updateLocalStorage('portfolio', selectedPortfolio.checked, value)
 	}
 
@@ -333,6 +333,7 @@ export const useSelectAFlow = () => {
 			}
 
 			setSelectedFlow({ ...selectedFlow, value: flowId, label })
+			setQueryParams({ flowId })
 
 			// process the flow setup
 			await processFlowSetup({ nodes, inputs, attrs, objectId })
@@ -393,7 +394,7 @@ export const useSelectAFlow = () => {
 		setSelectedPortfolio,
 		loadFlows,
 		onFlowChange,
-		onPolicyCheckedChange,
+		onPortfolioCheckedChange,
 		onPortfolioChange,
 		onStreamChange,
 		onStreamCheckedChange,
