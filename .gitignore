@@ -25,3 +25,7 @@ dist-ssr
 
 # text files
 todo.txt
+code.txt
+
+# data
+data/*

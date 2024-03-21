@@ -3,13 +3,11 @@ import { useState } from 'react'
 import { useRunAJobStore } from '../store'
 import { toast } from 'react-toastify'
 import {
-	convertSearchResponseToFlowDropdownOptions,
 	countInputs,
 	createLabel,
 	extractOptionalInputKeys,
 	extractSupportInputKeys,
 	fetchInputsfromInputsNodes,
-	fetchLatestFlowLatestTag,
 	filterInputNodes,
 	filterModelNodes,
 	filterModelsByPortfolio,
@@ -22,8 +20,9 @@ import {
 } from '../../../utils/helpers'
 import { MODELS_TO_USE } from '../../../../data/local-data'
 import { useGetControlTable } from './useGetControlTable'
-import { fetchFlows } from '../../../../api/meta-service'
+import { fetchFlows, fetchLatestFlowLatestTag } from '../../../../api/meta-service'
 import { useSetQueryParams } from './useSetQueryParams'
+import { mapFlowSearchToDropdownOptions } from '../../../../factories/flowTag'
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
 
@@ -123,6 +122,11 @@ export const useSelectAFlow = () => {
 
 		setSelectedFlow({ ...selectedFlow, checked })
 		updateLocalStorage('flow', checked, selectedFlow.value, selectedFlow.label)
+	}
+
+	function onPreviousJobChange(jobId) {
+		setSelectedPreviousJob({ ...selectedPreviousJob, value: jobId })
+		// TODO: add saved value to localStorage.
 	}
 
 	/**
@@ -252,10 +256,6 @@ export const useSelectAFlow = () => {
 		}
 	}
 
-	function onPreviousJobChange(jobId) {
-		setSelectedPreviousJob({ ...selectedPreviousJob, value: jobId })
-	}
-
 	async function processFlowSetup({ nodes, inputs, attrs, objectId }) {
 		// first step ✅
 		const { inputCategories, optionalInputs, supportInputs, inputsCounts, nonEmptyDependentParameterData } =
@@ -322,6 +322,7 @@ export const useSelectAFlow = () => {
 			// fetch the latest tag
 			/** @type {import('@/types').FlowTag} */
 			const tag = await fetchLatestFlowLatestTag(flowId)
+
 			const { attrs, definition } = tag
 			const { inputs, nodes, asOfTime, objectId } = definition
 			const { flowName } = attrs
@@ -333,6 +334,7 @@ export const useSelectAFlow = () => {
 			}
 
 			setSelectedFlow({ ...selectedFlow, value: flowId, label })
+			// set the flow in the url.
 			setQueryParams({ flowId })
 
 			// process the flow setup
@@ -363,7 +365,7 @@ export const useSelectAFlow = () => {
 				setSelectedFlow({ checked: selectedFlow.checked, value: '', label: '' })
 
 				const searchResult = await fetchFlows(selectedStream, selectedPortfolio)
-				const flowOptions = convertSearchResponseToFlowDropdownOptions(searchResult)
+				const flowOptions = mapFlowSearchToDropdownOptions(searchResult)
 
 				// TODO: here probably we need to reset the whole store.
 				// fetch the flows based on the portfolio and stream selected.

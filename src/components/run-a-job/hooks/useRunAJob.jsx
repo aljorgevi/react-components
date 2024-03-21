@@ -13,7 +13,8 @@ export const useRunAJob = () => {
 		selectedFlow,
 		setSelectedFlow,
 		setFlowOptions,
-		flowOptions
+		flowOptions,
+		setPolicyOptions
 	] = useRunAJobStore(state => [
 		state.selectedPolicy,
 		state.setSelectedPolicy,
@@ -24,7 +25,8 @@ export const useRunAJob = () => {
 		state.selectedFlow,
 		state.setSelectedFlow,
 		state.setFlowOptions,
-		state.flowOptions
+		state.flowOptions,
+		state.setPolicyOptions
 	])
 
 	return {
@@ -38,6 +40,7 @@ export const useRunAJob = () => {
 		setSelectedFlow,
 		flowOptions,
 		isLoadingFlows,
-		setFlowOptions
+		setFlowOptions,
+		setPolicyOptions
 	}
 }

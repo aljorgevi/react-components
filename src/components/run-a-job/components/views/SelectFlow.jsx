@@ -31,12 +31,8 @@ export const SelectFlow = () => {
 		selectedStream.value === '' || selectedPortfolio.value === '' || isLoadingFlows || isLoadingFlowMetadata
 
 	const flowDropdownDescription = `${
-		!isEmpty(flowOptions)
-			? 'Select a flow to run against the policy'
-			: 'Start by selecting a portfolio and stream to load flows'
+		!isEmpty(flowOptions) ? 'Select a flow to run' : 'Start by selecting a portfolio and stream to load flows'
 	}`
-
-	console.log({ selectedPortfolio })
 
 	return (
 		<section>
@@ -91,6 +87,7 @@ export const SelectFlow = () => {
 						key={selectedPreviousJob.value}
 						disable={isEmpty(previousJobOptions) || isLoadingFlows || isLoadingFlowMetadata}
 						options={previousJobOptions}
+						// TODO:
 						onChange={onPreviousJobChange}
 						value={selectedPreviousJob.value}
 						label='Previous job'

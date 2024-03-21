@@ -3,11 +3,14 @@
 import { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import { useRunAJob } from './hooks/useRunAJob'
-import { createLabel2, fetchFlowOptions, fetchLatestFlowLatestTag } from '../../utils/helpers'
 import { toast } from 'react-toastify'
 import { useSelectAFlow } from './hooks/useSelectAFlow'
 import { useRunAJobStore } from './store'
 import { useQueryChecker } from './hooks/useQueryChecker'
+import { fetchPolicies } from './utils/api'
+import { fetchFlows, fetchLatestFlowLatestTag } from '../../../api/meta-service'
+import { composeDetailedLabel } from '../../../factories/tagHelpers'
+import { mapFlowSearchToDropdownOptions } from '../../../factories/flowTag'
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
 
@@ -42,22 +45,31 @@ export function Layout({ children }) {
 	const selectedFlow = useRunAJobStore(store => store.selectedFlow)
 	const [loading, setLoading] = useState(true)
 	// We acces the store from this hook.
-	const { setSelectedPortfolio, setSelectedStream, setSelectedPolicy, setSelectedFlow, setFlowOptions } = useRunAJob()
+	const {
+		setSelectedPortfolio,
+		setSelectedStream,
+		setSelectedPolicy,
+		setSelectedFlow,
+		setFlowOptions,
+		setPolicyOptions
+	} = useRunAJob()
 	// Hook designed specifically to manage the store within the "FLOW" tab, we get the function to change the flow if values were saved in the local storage.
 	const { onFlowChange, processFlowSetup } = useSelectAFlow()
 
-	const initialPageWithQueryParams = async flowId => {
+	async function initialPageWithQueryParams() {
 		// first we fetch the latest tag of the flow
 		const tag = await fetchLatestFlowLatestTag(flowId)
+
 		if (tag) {
 			const { attrs, definition } = tag
 			const { inputs, nodes, asOfTime, objectId } = definition
 			const { flowName, portfolioId } = attrs
-			const label = createLabel2({ asOfTime, name: flowName?.value, objectId })
+			const label = composeDetailedLabel({ asOfTime, name: flowName?.value, objectId })
 
 			if (!portfolioId) return toast.error(nonPortfolioError)
 
-			const flowOptions = await fetchFlowOptions(portfolioId.value, 'ALL')
+			const searchResult = await fetchFlows(portfolioId.value, 'ALL')
+			const flowOptions = mapFlowSearchToDropdownOptions(searchResult)
 			const isFlowInOptions = flowOptions.some(flow => flow.value === flowId)
 
 			if (isFlowInOptions) {
@@ -65,7 +77,6 @@ export function Layout({ children }) {
 				setSelectedFlow({ value: flowId, checked: false, label })
 				setSelectedPortfolio({ value: portfolioId.value, checked: false })
 				setSelectedStream({ value: 'ALL', checked: false })
-				loadDataFromLocalStorage('policy', setSelectedPolicy)
 
 				await processFlowSetup({ nodes, inputs, attrs, objectId })
 
@@ -78,10 +89,34 @@ export function Layout({ children }) {
 		}
 	}
 
+	async function initialPageWithPolicyQueryParams() {
+		try {
+			const policyOptions = await fetchPolicies()
+			const isPolicyInOptions = policyOptions.some(policy => policy.value === policyId)
+
+			isPolicyInOptions
+				? setSelectedPolicy({ value: policyId, checked: false })
+				: toast.error('The selected policy is not among the available options.')
+
+			setPolicyOptions(policyOptions)
+		} catch (error) {
+			console.error('Error fetching policy options:', error)
+			toast.error('An error occurred while fetching policy options.')
+		}
+	}
+
 	useEffect(() => {
 		const loadData = async () => {
+			if (policyId) {
+				await initialPageWithPolicyQueryParams()
+			}
+
 			if (flowId) {
-				await initialPageWithQueryParams(flowId)
+				await initialPageWithQueryParams()
+
+				if (!policyId) {
+					loadDataFromLocalStorage('policy', setSelectedPolicy)
+				}
 			} else {
 				await delay(500)
 				loadDataFromLocalStorage('portfolio', setSelectedPortfolio)
@@ -94,7 +129,9 @@ export function Layout({ children }) {
 					const stream = JSON.parse(localStorage.getItem('stream'))
 
 					if (portfolio?.checked && stream?.checked) {
-						const flowOptions = await fetchFlowOptions(portfolio.value, stream.value)
+						const searchResult = await fetchFlows(portfolio.value, stream.value)
+						const flowOptions = mapFlowSearchToDropdownOptions(searchResult)
+
 						setFlowOptions(flowOptions)
 
 						loadDataFromLocalStorage('flow', value => {

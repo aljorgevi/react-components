@@ -730,14 +730,3 @@ export const SEARCH_INPUTS_NODE_RESPONSE = [
 		datasetKey: 'cure_rate_for_non_forbearance_overlay'
 	}
 ]
-
-export const FLOW_OPTIONS = [
-	{
-		value: 'flow-id-1',
-		label: 'Default & cure rate forecasting (7th Feb 202024 08:21am)'
-	},
-	{
-		value: 'flow-id-2',
-		label: 'Default & cure rate forecasting (10th Feb 202024 08:21am)'
-	}
-]

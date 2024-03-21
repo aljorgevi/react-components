@@ -2,12 +2,12 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-prototype-builtins */
 import {
-	FLOW_OPTIONS,
 	SEARCH_INPUTS_NODE_RESPONSE,
 	searchApiForFileContentTracFlowInputCategories,
 	tag,
 	tracFlowInputCategoriesData
 } from '../../data/local-data.js'
+import { composeDetailedLabel } from '../../factories/tagHelpers.js'
 
 const IS_EXP_ENV = process.env.NODE_ENV === 'production' ?? false
 
@@ -17,20 +17,6 @@ export function isEmpty(array) {
 	if (array === undefined || array === null) return true
 
 	return Array.isArray(array) && array.length === 0
-}
-
-// /** @type {import('@/types').FlowTag} */
-
-/**
- * Gets a FlowTag with specific attributes.
- * @returns {FlowTag} - The FlowTag.
- */
-export async function fetchLatestFlowLatestTag(id) {
-	await delay(500)
-
-	const copy = structuredClone(tag)
-	copy.definition.objectId = id
-	return copy
 }
 
 /**
@@ -332,7 +318,7 @@ function createInputOptionsForSelectAdvances(input) {
 		trac_policies
 	} = input.attrs
 	const name = datasetName?.value || datasetKeyDisplayName?.value || datasetKey?.value || 'Name not set'
-	const label = createLabel2({ name, objectId, asOfTime })
+	const label = composeDetailedLabel({ name, objectId, asOfTime })
 
 	return {
 		value: input.definition.objectId,
@@ -392,21 +378,13 @@ function addDoNotUseInputs(inputChoices, flowDefinitionInputs) {
 	return validatedInputChoices
 }
 
-export async function fetchFlowOptions(portfolio, stream) {
-	await delay(500)
-
-	return FLOW_OPTIONS
-}
-
 export function createLabel(id, name, asOfTime) {
 	return `${name} - ${formatCustomDate(asOfTime)} - ${id}`
 }
 
-export function createLabel2({ name, objectId, asOfTime }) {
-	return `${name} (ID: ${objectId}) (CREATED: ${formatCustomDate(asOfTime)})`
-}
-
 export function formatCustomDate(inputDate) {
+	if (!inputDate) return
+
 	const date = new Date(inputDate)
 	const options = {
 		day: 'numeric',
@@ -419,16 +397,6 @@ export function formatCustomDate(inputDate) {
 
 	const formattedDate = new Intl.DateTimeFormat('en-US', options).format(date)
 	return formattedDate.replace(/\b(\d)\b/g, '0$1').replace(/(\d{2})(\d{2})/, '$1$2')
-}
-
-export function convertSearchResponseToFlowDropdownOptions(searchResponse) {
-	const createFlowOptionsForSelectAdvances = tag => {}
-	const { tags = [] } = searchResponse
-	const filteredTags = tags.filter(tag => tag.attrs.viewInLists?.value)
-	const datasets = isEmpty(filteredTags) ? [] : filteredTags.map(createFlowOptionsForSelectAdvances)
-
-	// return datasets
-	return FLOW_OPTIONS
 }
 
 export function filterInputNodes(nodes) {

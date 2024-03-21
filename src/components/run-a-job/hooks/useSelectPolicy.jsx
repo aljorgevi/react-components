@@ -3,7 +3,11 @@ import { useSetQueryParams } from './useSetQueryParams'
 
 export const useSelectPolicy = () => {
 	const { setQueryParams } = useSetQueryParams()
-	const [selectedPolicy, setSelectedPolicy] = useRunAJobStore(state => [state.selectedPolicy, state.setSelectedPolicy])
+	const [selectedPolicy, setSelectedPolicy, policyOptions] = useRunAJobStore(state => [
+		state.selectedPolicy,
+		state.setSelectedPolicy,
+		state.policyOptions
+	])
 
 	const updateLocalStorage = (checked, value) => {
 		localStorage.setItem('policy', JSON.stringify({ checked, value }))
@@ -26,6 +30,7 @@ export const useSelectPolicy = () => {
 	return {
 		selectedPolicy,
 		onPolicyChange,
-		onCheckedChange
+		onCheckedChange,
+		policyOptions
 	}
 }

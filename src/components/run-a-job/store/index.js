@@ -17,6 +17,7 @@ import { immer } from 'zustand/middleware/immer'
  * flowOptions: DropdownOption[],
  * portfolioOptions: DropdownOption[],
  * streamOptions: DropdownOption[],
+ * policyOptions: DropdownOption[],
  * modelNodesInFlow: NodeChoices,
  * inputNodesInFlow: NodeChoices,
  * inputCategories: InputCategories,
@@ -32,6 +33,7 @@ import { immer } from 'zustand/middleware/immer'
  * setPreviousJobOptions: (previousJobOptions: DropdownOption[]) => void,
  * setFlowOptions: (flowOptions: DropdownOption[]) => void,
  * setPortfolioOptions: (portfolioOptions: DropdownOption[]) => void,
+ * setPolicyOptions: (policyOptions: DropdownOption[]) => void,
  * setStreamOptions: (streamOptions: DropdownOption[]) => void,
  * setJobDefinitionForRequestBody: (jobDefinitionForRequestBody: JobDefinitionForRequestBody) => void,
  * setModelNodesInFlow: (modelNodesInFlow: NodeChoices) => void,
@@ -120,6 +122,7 @@ export const createRunAJobSlice = set => ({
 	selectedPreviousJob: { checked: false, value: '', label: '' },
 	previousJobOptions: [],
 	flowOptions: [],
+	policyOptions: [],
 	portfolioOptions: [
 		{ value: 'uk-secured', label: 'UK Secured' },
 		{ value: 'uk-unsecured', label: 'UK Unsecured' }
@@ -157,7 +160,8 @@ export const createRunAJobSlice = set => ({
 	setNonEmptyDependentParameterData: nonEmptyDependentParameterData =>
 		set({ nonEmptyDependentParameterData }, false, 'setNonEmptyDependentParameterData'),
 	setPreviousJobOptions: previousJobOptions => set({ previousJobOptions }, false, 'setPreviousJobOptions'),
-	setInputNodesInFlow: inputNodesInFlow => set({ inputNodesInFlow }, false, 'setInputNodesInFlow')
+	setInputNodesInFlow: inputNodesInFlow => set({ inputNodesInFlow }, false, 'setInputNodesInFlow'),
+	setPolicyOptions: policyOptions => set({ policyOptions }, false, 'setPolicyOptions')
 })
 
 /**

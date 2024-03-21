@@ -1,0 +1,32 @@
+.container-cell {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.top-cell {
+	width: 100%;
+	display: flex;
+	justify-content: space-between;
+	align-items: center; /* Adjusted to center-align the badges and icons vertically */
+}
+
+.badges-cell,
+.icons-cell {
+	display: flex;
+	align-items: center; /* Ensure badges and icons are centered within their containers */
+}
+
+.badge-cell,
+.icon-cell {
+	margin: 0 4px; /* Adjust spacing between badges and icons */
+}
+
+.spacer-cell {
+	flex-grow: 1;
+}
+
+.id-cell {
+	text-align: center;
+	width: 100%; /* Ensures the text can be centered in the space available */
+}
