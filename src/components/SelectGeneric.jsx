@@ -2,14 +2,6 @@ import { useState } from 'react'
 import PropTypes from 'prop-types'
 import { Form } from 'react-bootstrap'
 
-const styles = {
-	formLabel: {
-		LineHeight: '1',
-		fontWeight: '500',
-		fontSize: '.875rem'
-	}
-}
-
 SelectGeneric.propTypes = {
 	options: PropTypes.arrayOf(
 		PropTypes.shape({
@@ -38,7 +30,7 @@ export function SelectGeneric({ disable = false, options, defaultValue = '', lab
 
 	return (
 		<Form.Group controlId='formGridState'>
-			<Form.Label style={styles.formLabel}>{label}</Form.Label>
+			<Form.Label style={{ LineHeight: '1', fontWeight: '500', fontSize: '.875rem' }}>{label}</Form.Label>
 			<Form.Control disabled={disable} as='select' value={value || selectedValue} onChange={handleSelectChange}>
 				<option value='' disabled>
 					{options.length ? 'Choose...' : 'No Data Available'}

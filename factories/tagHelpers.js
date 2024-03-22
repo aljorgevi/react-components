@@ -11,3 +11,22 @@ import { formatCustomDate } from '../src/utils/helpers'
 export function composeDetailedLabel({ name = 'Undefined Name', objectId, asOfTime }) {
 	return `${name} (ID: ${objectId}) (CREATED: ${formatCustomDate(asOfTime)})`
 }
+
+/**
+ * Destructures values from a tag object.
+ * @param {Object} tag - The tag object containing attrs and definition.
+ * @returns {Object} The destructured values.
+ */
+export function extractTagDetails(tag) {
+	// const unknownValue = 'Unknown'
+	const { definition, attrs } = tag
+	const { asOfTime, objectId } = definition
+	// add more trac_values...
+
+	return {
+		definition,
+		attrs,
+		asOfTime,
+		objectId
+	}
+}

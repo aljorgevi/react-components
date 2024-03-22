@@ -9,8 +9,8 @@ import { useRunAJobStore } from './store'
 import { useQueryChecker } from './hooks/useQueryChecker'
 import { fetchPolicies } from './utils/api'
 import { fetchFlows, fetchLatestFlowLatestTag } from '../../../api/meta-service'
-import { composeDetailedLabel } from '../../../factories/tagHelpers'
-import { mapFlowSearchToDropdownOptions } from '../../../factories/flowTag'
+import { extractFlowTagDetails, mapFlowSearchToDropdownOptions } from '../../../factories/flowTag'
+import { LoadingMessagePage } from '../LoadingMessagePage'
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
 
@@ -61,10 +61,7 @@ export function Layout({ children }) {
 		const tag = await fetchLatestFlowLatestTag(flowId)
 
 		if (tag) {
-			const { attrs, definition } = tag
-			const { inputs, nodes, asOfTime, objectId } = definition
-			const { flowName, portfolioId } = attrs
-			const label = composeDetailedLabel({ asOfTime, name: flowName?.value, objectId })
+			const { inputs, nodes, objectId, portfolioId, attrs, detailedLabel } = extractFlowTagDetails(tag)
 
 			if (!portfolioId) return toast.error(nonPortfolioError)
 
@@ -74,7 +71,7 @@ export function Layout({ children }) {
 
 			if (isFlowInOptions) {
 				setFlowOptions(flowOptions)
-				setSelectedFlow({ value: flowId, checked: false, label })
+				setSelectedFlow({ value: flowId, checked: false, label: detailedLabel })
 				setSelectedPortfolio({ value: portfolioId.value, checked: false })
 				setSelectedStream({ value: 'ALL', checked: false })
 
@@ -82,6 +79,7 @@ export function Layout({ children }) {
 
 				setLoading(false)
 			} else {
+				setFlowOptions(flowOptions)
 				toast.error('The selected flow is not among the available options for the chosen portfolio and stream.')
 			}
 		} else {
@@ -107,10 +105,12 @@ export function Layout({ children }) {
 
 	useEffect(() => {
 		const loadData = async () => {
+			// The user has loaded a policy id in the url
 			if (policyId) {
 				await initialPageWithPolicyQueryParams()
 			}
 
+			// The user has loaded a flow id in the url
 			if (flowId) {
 				await initialPageWithQueryParams()
 
@@ -155,7 +155,9 @@ export function Layout({ children }) {
 			}
 		}
 
-		loadData()
+		delay(10000).then(() => {
+			loadData()
+		})
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
@@ -168,11 +170,9 @@ export function Layout({ children }) {
 			<div>
 				{loading ? (
 					<div className='d-flex justify-content-center align-items-center' style={{ height: '50vh' }}>
-						<div>
-							<h5 className='mt-5' style={{ fontWeight: 'bold', textAlign: 'center' }}>
-								Loading, please wait...
-							</h5>
-						</div>
+						<h5 className='mt-5' style={{ fontWeight: 'bold', textAlign: 'center' }}>
+							Loading, please wait...
+						</h5>
 					</div>
 				) : (
 					children

@@ -1,4 +1,4 @@
-import { composeDetailedLabel } from './tagHelpers'
+import { composeDetailedLabel, extractTagDetails } from './tagHelpers'
 
 /**
  * Converts a flow tag into a dropdown option format.
@@ -20,4 +20,33 @@ export function mapFlowSearchToDropdownOptions(searchResponse) {
 
 	// return datasets
 	return options
+}
+
+/**
+ * Destructures values from a flow tag object.
+ * @param {Object} tag - The tag object containing attrs and definition.
+ * @returns {Object} The destructured values.
+ */
+export function extractFlowTagDetails(tag) {
+	if (!tag) return
+
+	const unknownValue = 'Unknown'
+	const { objectId, asOfTime, definition, attrs } = extractTagDetails(tag)
+
+	const { inputs, nodes } = definition
+	const { flowName, portfolioId, viewInLists } = attrs
+	const label = composeDetailedLabel({ asOfTime, name: flowName?.value, objectId })
+
+	return {
+		detailedLabel: label,
+		definition,
+		attrs,
+		inputs,
+		nodes,
+		asOfTime,
+		objectId,
+		flowName: flowName?.value || unknownValue,
+		portfolioId: portfolioId?.value || unknownValue,
+		viewInLists: viewInLists?.value || true
+	}
 }

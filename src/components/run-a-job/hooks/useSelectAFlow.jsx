@@ -18,7 +18,7 @@ import {
 	isEmpty,
 	setDefaultInputsForJob
 } from '../../../utils/helpers'
-import { MODELS_TO_USE } from '../../../../data/local-data'
+import modelsData from '../../../../data/search_models_results.json'
 import { useGetControlTable } from './useGetControlTable'
 import { fetchFlows, fetchLatestFlowLatestTag } from '../../../../api/meta-service'
 import { useSetQueryParams } from './useSetQueryParams'
@@ -162,7 +162,7 @@ export const useSelectAFlow = () => {
 	}
 
 	// nodes all the nodes, we filter them inside the function
-	async function loadModelsInfoSecondStep({ nodes, isModelVersioning, selectedPortfolio }) {
+	async function extractModelFlowInformation({ nodes, isModelVersioning, selectedPortfolio }) {
 		// Extract model nodes of type 'model'.
 		const modelNodes = filterModelNodes(nodes)
 		const normalizedPortfolio = selectedPortfolio.toLowerCase()
@@ -210,7 +210,7 @@ export const useSelectAFlow = () => {
 			// modelsToUse = await Promise.all(searchPromises)
 		}
 
-		modelsToUse = structuredClone(MODELS_TO_USE)
+		modelsToUse = modelsData
 
 		if (isEmpty(modelsToUse)) {
 			throw new Error('No models found, please check the portfolio selected, or the model versioning.')
@@ -227,13 +227,13 @@ export const useSelectAFlow = () => {
 	}
 
 	async function loadInputsSecondStep({ nodes, flowDefinitionInputs }) {
-		const inputNodes = Object.entries(nodes).filter(([_, value]) => value.type?.toLowerCase() === 'input')
+		const inputNodes = Object.entries(nodes).filter(([, value]) => value.type?.toLowerCase() === 'input')
 
 		const inputsNodeSearchPromiseResponse = await fetchInputsfromInputsNodes(inputNodes)
 
 		// We do this in case a input has not dataset available. // TODO: not sure if the key in the node it's always datasetKey. ask this.
 		const mappedInputsWithDatasetKeyresponse = inputsNodeSearchPromiseResponse.map((response, index) => {
-			const inputNodesKeys = inputNodes.map(([key, _]) => key)
+			const inputNodesKeys = inputNodes.map(([key]) => key)
 			response.datasetKey = inputNodesKeys[index] || null
 			return response
 		})
@@ -263,7 +263,7 @@ export const useSelectAFlow = () => {
 
 		// second step ✅
 		const isModelVersioning = attrs.useModelVersioning?.value
-		const { modelNodesInFlow, modelsJobForRequestBody } = await loadModelsInfoSecondStep({
+		const { modelNodesInFlow, modelsJobForRequestBody } = await extractModelFlowInformation({
 			nodes,
 			isModelVersioning,
 			selectedPortfolio: selectedPortfolio.value

@@ -16,15 +16,15 @@ export async function fetchFlows(stream, portfolio) {
  */
 export async function fetchLatestFlowLatestTag(id, sleepTime = 500) {
 	await delay(sleepTime)
-	console.log('fetchLatestFlowLatestTag', id)
+	console.log('fetchLatestFlowLatestTag...', id)
 
-	const listOfFlows = {
+	const flows = {
 		'flow-id-1': defaultAndCureRateFlow
 	}
 
-	if (!listOfFlows[id]) {
+	if (!flows[id]) {
 		throw new Error('Flow does not exist in server.')
 	}
 
-	return listOfFlows[id]
+	return flows[id]
 }

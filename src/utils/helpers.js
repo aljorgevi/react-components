@@ -1,12 +1,7 @@
 /* eslint-disable camelcase */
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-prototype-builtins */
-import {
-	SEARCH_INPUTS_NODE_RESPONSE,
-	searchApiForFileContentTracFlowInputCategories,
-	tag,
-	tracFlowInputCategoriesData
-} from '../../data/local-data.js'
+import { SEARCH_INPUTS_NODE_RESPONSE, searchApiForFileContentTracFlowInputCategories } from '../../data/local-data.js'
 import { composeDetailedLabel } from '../../factories/tagHelpers.js'
 
 const IS_EXP_ENV = process.env.NODE_ENV === 'production' ?? false
@@ -99,15 +94,6 @@ export function getDatasetIdToFetch(searchResponse) {
 
 export async function mockSearchCall() {
 	return searchApiForFileContentTracFlowInputCategories
-}
-
-/**
- *
- * @param {string} id
- * @returns {import('@/types').TracFlowInputCategory[]}
- */
-export function mockFileContentControllTableFetch(id) {
-	return tracFlowInputCategoriesData
 }
 
 /**
