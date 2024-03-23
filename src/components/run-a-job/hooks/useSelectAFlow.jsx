@@ -22,7 +22,7 @@ import modelsData from '../../../../data/search_models_results.json'
 import { useGetControlTable } from './useGetControlTable'
 import { fetchFlows, fetchLatestFlowLatestTag } from '../../../../api/meta-service'
 import { useSetQueryParams } from './useSetQueryParams'
-import { mapFlowSearchToDropdownOptions } from '../../../../factories/flowTag'
+import { extractFlowTagDetails, mapFlowSearchToDropdownOptions } from '../../../../factories/flowTag'
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
 
@@ -313,27 +313,20 @@ export const useSelectAFlow = () => {
 	 */
 	async function onFlowChange(flowId, sendToast = true) {
 		try {
+			setIsLoadingFlowMetadata(true)
 			if (sendToast) {
 				var loadingToast = toast.loading('Loading flow details...')
 			}
 
-			setIsLoadingFlowMetadata(true)
-
-			// fetch the latest tag
-			/** @type {import('@/types').FlowTag} */
 			const tag = await fetchLatestFlowLatestTag(flowId)
-
-			const { attrs, definition } = tag
-			const { inputs, nodes, asOfTime, objectId } = definition
-			const { flowName } = attrs
-			const label = createLabel(objectId, flowName?.value, asOfTime)
+			const { inputs, nodes, objectId, attrs, detailedLabel } = extractFlowTagDetails(tag)
 
 			// now we check if the user has selected checked so we can save the new flow in the local storage.
 			if (selectedFlow.checked) {
-				updateLocalStorage('flow', true, flowId, label)
+				updateLocalStorage('flow', true, flowId, detailedLabel)
 			}
 
-			setSelectedFlow({ ...selectedFlow, value: flowId, label })
+			setSelectedFlow({ ...selectedFlow, value: flowId, label: detailedLabel })
 			// set the flow in the url.
 			setQueryParams({ flowId })
 

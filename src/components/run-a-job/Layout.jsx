@@ -7,7 +7,7 @@ import { toast } from 'react-toastify'
 import { useSelectAFlow } from './hooks/useSelectAFlow'
 import { useRunAJobStore } from './store'
 import { useQueryChecker } from './hooks/useQueryChecker'
-import { fetchPolicies } from './utils/api'
+import { fetchPolicies } from '../../../api/policy-service'
 import { fetchFlows, fetchLatestFlowLatestTag } from '../../../api/meta-service'
 import { extractFlowTagDetails, mapFlowSearchToDropdownOptions } from '../../../factories/flowTag'
 import { LoadingMessagePage } from '../LoadingMessagePage'
@@ -118,7 +118,6 @@ export function Layout({ children }) {
 					loadDataFromLocalStorage('policy', setSelectedPolicy)
 				}
 			} else {
-				await delay(500)
 				loadDataFromLocalStorage('portfolio', setSelectedPortfolio)
 				loadDataFromLocalStorage('stream', setSelectedStream)
 				loadDataFromLocalStorage('policy', setSelectedPolicy)
@@ -150,12 +149,11 @@ export function Layout({ children }) {
 					}
 				}
 
-				await delay(1000)
 				setLoading(false)
 			}
 		}
 
-		delay(10000).then(() => {
+		delay(1500).then(() => {
 			loadData()
 		})
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -167,17 +165,7 @@ export function Layout({ children }) {
 				<h3>Run a Job</h3>
 				<h5>{selectedFlow.label}</h5>
 			</div>
-			<div>
-				{loading ? (
-					<div className='d-flex justify-content-center align-items-center' style={{ height: '50vh' }}>
-						<h5 className='mt-5' style={{ fontWeight: 'bold', textAlign: 'center' }}>
-							Loading, please wait...
-						</h5>
-					</div>
-				) : (
-					children
-				)}
-			</div>
+			<div>{loading ? <LoadingMessagePage>Loading, please wait...</LoadingMessagePage> : children}</div>
 		</section>
 	)
 }

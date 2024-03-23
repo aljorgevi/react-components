@@ -9,7 +9,8 @@ export function SelectInputs() {
 	const { inputNodesInFlow, selectedInputsInJobDefinition, onInputChange, inputCategories, selectedPolicy } =
 		useSelectInputs()
 
-	console.log({ inputNodesInFlow })
+	console.log({ inputCategories })
+
 	const inputs = generateInputsSelectOptions(inputNodesInFlow, selectedInputsInJobDefinition)
 
 	return (

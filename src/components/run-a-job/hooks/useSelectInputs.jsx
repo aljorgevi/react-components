@@ -6,9 +6,9 @@ export function useSelectInputs() {
 		body,
 		setJobDefinitionForRequestBody,
 		inputCategories, // TODO: the keys in the inputs array is the key in the input nodes of the flow. TODO: we need to 100% confirm the key is the same as datasetKey
-		optionalInputs,
-		supportInputs,
-		inputsCounts,
+		// optionalInputs,
+		// supportInputs,
+		// inputsCounts,
 		selectedPolicy
 	] = useRunAJobStore(state => [
 		state.inputNodesInFlow,
@@ -22,7 +22,7 @@ export function useSelectInputs() {
 	])
 	const { inputs } = body
 
-	const { optionalCategories, requiredCategories } = inputCategories
+	// const { optionalCategories, requiredCategories } = inputCategories
 
 	function onInputChange({ datasetKey, inputId }) {
 		setJobDefinitionForRequestBody({

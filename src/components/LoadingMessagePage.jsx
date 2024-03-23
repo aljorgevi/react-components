@@ -1,7 +1,9 @@
+import propTypes from 'prop-types'
+
 const IsolatedContainer = ({ children, ...props }) => (
 	<div
 		style={{
-			marginTop: 300,
+			marginTop: 250,
 			display: 'flex',
 			justifyContent: 'center'
 		}}
@@ -25,6 +27,7 @@ export function LoadingMessagePage({ children }) {
 				>
 					{children}
 				</p>
+
 				<Loading />
 			</div>
 		</IsolatedContainer>
@@ -38,10 +41,25 @@ const sizes = {
 }
 
 const Loading = ({ size = 'medium', className = '', ...props }) => (
-	<div style={sizes[size]} className={`${className} lds-ellipsis`} {...props}>
-		<div />
-		<div />
-		<div />
-		<div />
-	</div>
+	<section style={{ position: 'relative', height: 70 }}>
+		<div style={sizes[size]} className={`${className} lds-ellipsis`} {...props}>
+			<div />
+			<div />
+			<div />
+			<div />
+		</div>
+	</section>
 )
+
+Loading.propTypes = {
+	size: propTypes.string,
+	className: propTypes.string
+}
+
+IsolatedContainer.propTypes = {
+	children: propTypes.node
+}
+
+LoadingMessagePage.propTypes = {
+	children: propTypes.node
+}
