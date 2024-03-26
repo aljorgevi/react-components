@@ -14,10 +14,27 @@ SelectGeneric.propTypes = {
 	text: PropTypes.string,
 	onChange: PropTypes.func,
 	value: PropTypes.string,
-	disable: PropTypes.bool
+	disable: PropTypes.bool,
+	error: PropTypes.string
 }
 
-export function SelectGeneric({ disable = false, options, defaultValue = '', label, text, onChange, value }) {
+/**
+ * `SelectGeneric` is a reusable select input component utilizing React Bootstrap.
+ * It renders a dropdown list based on the provided options and handles selection changes.
+ *
+ * @param {Object} props Component props.
+ * @param {Array<{value: string, label: string}>} props.options - Array of option objects for the select dropdown.
+ * @param {string} [props.defaultValue=''] - The default value of the select input.
+ * @param {string} props.label - Label for the select input.
+ * @param {string} [props.text] - Optional additional text to be displayed as Form.Text, usually for providing guidance.
+ * @param {Function} props.onChange - Callback function that is called when the selected option changes. Receives the new value as an argument.
+ * @param {string} [props.value] - Controlled value of the select input; if provided, the component behaves as controlled.
+ * @param {boolean} [props.disable=false] - If `true`, disables the select input.
+ * @param {string} [props.error] - Error message text. If provided, displays an error message under the select input.
+ *
+ * @returns {JSX.Element} The `SelectGeneric` component.
+ */
+export function SelectGeneric({ error, disable = false, options, defaultValue = '', label, text, onChange, value }) {
 	const [selectedValue, setSelectedValue] = useState(defaultValue)
 
 	const handleSelectChange = event => {
@@ -42,6 +59,7 @@ export function SelectGeneric({ disable = false, options, defaultValue = '', lab
 				))}
 			</Form.Control>
 			<Form.Text className='text-muted'>{text}</Form.Text>
+			{error && <Form.Text className='text-danger'>{error}</Form.Text>}
 		</Form.Group>
 	)
 }

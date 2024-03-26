@@ -22,7 +22,8 @@ function App() {
 										placeholder: 'Enter your first name',
 										type: 'text',
 										description: 'Enter your first name',
-										validation: {
+										// colSize: { sm: 12, md: 6 },
+										validations: {
 											required: true,
 											message: 'First name is required',
 											pattern: {
@@ -39,7 +40,21 @@ function App() {
 											}
 										}
 									},
-									{ name: 'email', label: 'Email', placeholder: 'Enter your email', type: 'email' },
+									{
+										name: 'email',
+										label: 'Email',
+										placeholder: 'Enter your email',
+										type: 'email',
+
+										validations: {
+											required: true,
+											message: 'Email is required',
+											pattern: {
+												value: /^\S+@\S+\.\S+$/,
+												message: 'Invalid email format'
+											}
+										}
+									},
 									{
 										name: 'country',
 										label: 'Country',
@@ -48,8 +63,11 @@ function App() {
 											{ label: 'Select a country', value: '' },
 											{ label: 'United States', value: 'US' },
 											{ label: 'Canada', value: 'CA' }
-											// Add more options as needed
-										]
+										],
+										validations: {
+											required: true,
+											message: 'Country is required'
+										}
 									}
 								]}
 							/>
