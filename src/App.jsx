@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
 import { Container } from 'react-bootstrap'
 import { ToastContainer } from 'react-toastify'
 import { RunAJob } from './components/run-a-job'
-import { GenericForm } from './components/GenericForm'
+import { DynamicSidebarLayout } from './components/DynamicSidebarLayout'
 
 function App() {
 	return (
@@ -11,65 +11,18 @@ function App() {
 				<Container>
 					<Switch>
 						<Route path='/' exact>
-							<GenericForm
-								onSubmit={data => {
-									console.log(data)
-								}}
-								schema={[
-									{
-										name: 'firstName',
-										label: 'First Name',
-										placeholder: 'Enter your first name',
-										type: 'text',
-										description: 'Enter your first name',
-										// colSize: { sm: 12, md: 6 },
-										validations: {
-											required: true,
-											message: 'First name is required',
-											pattern: {
-												value: /^[a-zA-Z]+$/,
-												message: 'First name should contain only letters'
-											},
-											minLength: {
-												value: 2,
-												message: 'First name should have at least 2 characters'
-											},
-											maxLength: {
-												value: 20,
-												message: 'First name should have at most 20 characters'
-											}
-										}
-									},
-									{
-										name: 'email',
-										label: 'Email',
-										placeholder: 'Enter your email',
-										type: 'email',
-
-										validations: {
-											required: true,
-											message: 'Email is required',
-											pattern: {
-												value: /^\S+@\S+\.\S+$/,
-												message: 'Invalid email format'
-											}
-										}
-									},
-									{
-										name: 'country',
-										label: 'Country',
-										type: 'select',
-										options: [
-											{ label: 'Select a country', value: '' },
-											{ label: 'United States', value: 'US' },
-											{ label: 'Canada', value: 'CA' }
-										],
-										validations: {
-											required: true,
-											message: 'Country is required'
-										}
-									}
+							<DynamicSidebarLayout
+								loading={false}
+								title='Home'
+								description='Welcome to the home page'
+								navItems={[
+									{ eventKey: 'inputs', label: 'Inputs' },
+									{ eventKey: 'models', label: 'Models' }
 								]}
+								viewComponents={{
+									inputs: <div>Inputs</div>,
+									models: <div>Models</div>
+								}}
 							/>
 						</Route>
 						<Route path='/run-a-job'>
