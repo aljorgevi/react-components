@@ -1,0 +1,6 @@
+Problem Statement
+
+Title: Enhancing User and Developer Experience by Migrating to Next.js
+
+Background:
+Our current web application, built with legacy class-based React components, is increasingly difficult to maintain and scale. Users experience slower load times and less responsive interfaces, and developers face challenges with outdated practices and complex codebases. By migrating to Next.js, which supports server-side rendering (SSR), static site generation (SSG), and modern React practices, we aim to significantly enhance both user experience (UX) and developer experience (DX).
