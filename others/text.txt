@@ -1,6 +1,37 @@
-Problem Statement
+import axios, { AxiosError } from 'axios';
 
-Title: Enhancing User and Developer Experience by Migrating to Next.js
+/**
+ * Handles Axios errors and returns a user-friendly message.
+ * @param error - The error caught during Axios request.
+ * @returns A user-friendly error message.
+ */
+function handleAxiosError(error: unknown): string {
+    if (axios.isAxiosError(error)) {
+        const axiosError = error as AxiosError;
+        if (axiosError.response) {
+            // The request was made and the server responded with a status code
+            // that falls out of the range of 2xx
+            return `Request failed with status ${axiosError.response.status}: ${axiosError.response.statusText}`;
+        } else if (axiosError.request) {
+            // The request was made but no response was received
+            return 'No response received from the server. Please try again later.';
+        } else {
+            // Something happened in setting up the request that triggered an Error
+            return `Error in setting up the request: ${axiosError.message}`;
+        }
+    } else {
+        // Not an Axios error
+        return 'An unexpected error occurred. Please try again later.';
+    }
+}
 
-Background:
-Our current web application, built with legacy class-based React components, is increasingly difficult to maintain and scale. Users experience slower load times and less responsive interfaces, and developers face challenges with outdated practices and complex codebases. By migrating to Next.js, which supports server-side rendering (SSR), static site generation (SSG), and modern React practices, we aim to significantly enhance both user experience (UX) and developer experience (DX).
+// Usage in your exampleFetching function
+export async function exampleFetching(url: string): Promise<void> {
+    try {
+        const response = await axios(url);
+        console.log(response);
+    } catch (error) {
+        const errorMessage = handleAxiosError(error);
+        console.log(errorMessage);
+    }
+}
