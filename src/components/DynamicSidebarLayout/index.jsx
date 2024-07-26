@@ -14,6 +14,7 @@ import { Layout } from './Layout'
  * @param {Boolean} [props.loading] If the layout is in loading state.
  */
 export function DynamicSidebarLayout({ navItems, viewComponents, title, description, loading }) {
+	console.log("hello")
 	const [selectedOption, setSelectedOption] = useState(navItems[0].eventKey) // Initialize with the first item's key
 
 	return (
